@@ -1,4 +1,4 @@
-class oficio:
+class Oficio:
     descricao = ''
     emissor = ''
     arquivo = ''
@@ -31,11 +31,11 @@ class oficio:
     def to_json(self):
         return(
             {
-                "descrição": self.descricao,
+                "descricao": self.descricao,
                 "emissor": self.emissor,
                 "arquivo": self.arquivo,
-                "nr_paginas": self.nr_pagins, 
-                "dataProtocolo": self.data_protocolo,
+                "nr_paginas": self.nr_paginas, 
+                "data_protocolo": self.data_protocolo,
                 "hash": self.Hash
 
             }
