@@ -20,7 +20,6 @@ class Persistencia:
         return False
 
     def inserir(self, dados):
-        print(isinstance(dados, Oficio))
         if isinstance(dados, Oficio):
             if not self.verificar_hash(dados.Hash):
                 self.oficios.append(dados)

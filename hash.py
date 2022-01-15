@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-import hashlib, sys, qrcode, PyPDF2, json
+import hashlib, PyPDF2, json
+from PyPDF2.utils import PdfReadError
 from datetime import date
 from lib.persistencia import Persistencia
 from lib.oficio import Oficio
@@ -36,6 +37,7 @@ if __name__=="__main__":
       print("Escolha uma opção: ")
       print("1 - Protoclar novo ofício")
       print("2 - Listar ofícios protolados")
+      print("3 - Exportar QR Code de ofícios protolados")
       print("9 - Sair")
       e = input("Digite a escolha: ")
 
@@ -45,26 +47,53 @@ if __name__=="__main__":
             emissor = input("Digite o emissor do documento: ")
             arquivo = input("Informe o arquivo PDF do documento digitalizado: ")
 
-            # try:
-            Hash = hashfile(arquivo)
-            nr_paginas = count_pages(arquivo)
-            o = Oficio(
-               descricao = descricao,
-               emissor = emissor,
-               arquivo = arquivo,
-               nr_paginas = nr_paginas,
-               data_protocolo = date.today().strftime("%d/%m/%Y"),
-               Hash = Hash
-            )
-            o.print_data()
-            if oficios_db.inserir(o):
-               oficios_db.persistir()
-               print("Base de oficios atualizada")
-            else:
-               print("Oficio já consta na base de protocolos")
-            break
-            # except:
-               #  print("Arquivo no formato invalido ou inexistente")
+            try:
+               Hash = hashfile(arquivo)
+               nr_paginas = count_pages(arquivo)
+               o = Oficio(
+                  descricao = descricao,
+                  emissor = emissor,
+                  arquivo = arquivo,
+                  nr_paginas = nr_paginas,
+                  data_protocolo = date.today().strftime("%d/%m/%Y"),
+                  Hash = Hash
+               )
+               o.print_data()
+               if oficios_db.inserir(o):
+                  oficios_db.persistir()
+                  print("Base de oficios atualizada")
+                  o.exportar_qrcode()
+               else:
+                  print("Oficio já consta na base de protocolos")
+               break
+            except PdfReadError:
+               print("Arquivo no formato invalido ou inexistente\nPor hora esse script só processa arquivos PDF")
+      elif e == '2':
+         while(True):
+            try:
+               for i in range(len(oficios_db.oficios)):
+                  print("{} - {}".format(i+1, oficios_db.oficios[i].descricao))
+               ex = input("Digite o numero para detalhar o ofício ou 'sair' para retornar ao menu anterior: ")
+               if ex == 'sair':
+                  break
+               else: 
+                  oficios_db.oficios[int(ex)-1].print_data()
+            except ValueError:
+               print("Digite um numero válido ou 'sair'")
+      elif e == '3':
+         while(True):
+            try:
+               for i in range(len(oficios_db.oficios)):
+                  print("{} - {}".format(i+1, oficios_db.oficios[i].descricao))
+               ex = input("Digite o numero para exportar o QR Code ou 'sair' para retornar ao menu anterior: ")
+               if ex == 'sair':
+                  break
+               else: 
+                  oficios_db.oficios[int(ex)-1].exportar_qrcode()
+            except ValueError:
+               print("Digite um numero válido ou 'sair'")
+
+
       elif e == '9':
          break
       else:
