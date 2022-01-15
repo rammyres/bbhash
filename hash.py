@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 import hashlib, sys, qrcode, PyPDF2, json
 from datetime import date
+from lib.persistencia import persistencia
+from lib.oficio import oficio
 
 def count_pages(filename):
     count = 0
@@ -8,18 +10,6 @@ def count_pages(filename):
        data = PyPDF2.PdfFileReader(file)
        count = data.getNumPages()
     return count
-
-def print_data(dados):
-   if isinstance(dados, dict):
-      print("Descrição: {}".format(dados['descrição']))
-      print("Emissor: {}".format(dados['emissor']))
-      print("Arquivo: {}".format(dados['arquivo']))
-      print("Numero de páginas: {}".format(dados['nr_paginas']))	
-      print("Protocolado em: {}".format(dados['dataProtocolo']))	
-      print("Hash: {}".format(dados['hash']))	
-   else:
-      print("Formato inválido")
-
 
 def hashfile(file): 
    sha256 = hashlib.sha256()
@@ -36,50 +26,40 @@ def hashfile(file):
    except:
       print("Arquivo vazio ou inexistente")
 
+
 if __name__=="__main__":
-   try:
-      with open("oficios.json") as oficios_store:
-         oficios_db = json.load(oficios_store)   
-   except FileNotFoundError:
-      with open("oficios.json", "w") as oficios_store:
-         print("Criando persistência")
-         json.dump({"oficios":[]},oficios_store)
+   oficios_db = persistencia("oficios.json")
+   print("Script de protocolo de oficios")
+   while(True):
+       print("Escolha uma opção: ")
+       print("1 - Protoclar novo ofício")
+       print("2 - Listar ofícios protolados")
+       e = input("Digite a escolha: ")
+
+       if e == "1":
+           while(True):
+            descricao = input("Digite a descrição do documento: ")
+            emissor = input("Digite o emissor do documento: ")
+            arquivo = input("Informe o arquivo PDF do documento digitalizado: ")
+
+            try:
+                Hash = hashfile(arquivo)
+                nr_paginas = count_pages(arquivo)
+                o = oficio(
+                    descricao = descricao,
+                    emissor = emissor,
+                    arquivo = arquivo,
+                    nr_paginas = nr_paginas,
+                    data_protocolo = date.today().strftime("%d/%m/%Y"),
+                    Hash = Hash
+                )
+                o.print_data()
+                oficios_db.inserir(o)
+                oficios_db.persistir()
+                break
+            except:
+                print("Arquivo no formato invalido ou inexistente")
 
 
-   if len(sys.argv)==2:
+       
 
-      descricao = input("Insira a descrição do arquivo: ") 
-      emissor = input("Informe o emissor do documento: ")
-      filehash = hashfile(sys.argv[1])
-      contagem = count_pages(sys.argv[1])
-         
-      if filehash:
-         dados = {
-               "descrição": descricao,
-               "emissor": emissor,
-               "arquivo": sys.argv[1],
-               "nr_paginas": contagem, 
-               "dataProtocolo": date.today().strftime("%d/%m/%Y"),
-               "hash": filehash
-               }
-
-
-         print_data(dados)
-         repetido = False
-         for o in oficios_db['oficios']:
-           if dados['hash'] == o['hash']:
-              repetido = True
-              break
-         if repetido:
-            print("Este oficio já foi protocolado anteriormente")
-         else: 
-            oficios_db['oficios'].append(dados)
-            img = qrcode.make(dados)
-            img.save("{}.png".format(sys.argv[1]))
-            print("QR Code {}.png exportado".format(sys.argv[1]))
-
-         with open("oficios.json", "w") as oficios_store:
-            json.dump(oficios_db, oficios_store)
-            oficios_store.close()   
-   else:
-      print("O numero de argumentos deve ser igual a um")
