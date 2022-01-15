@@ -13,11 +13,18 @@ class Persistencia:
                 print("Criando persistência")
                 json.dump({"oficios" : []}, oficios_store)
 
+    def verificar_hash(self, hash):
+        for o in self.oficios:
+            if o.Hash == hash:
+                return True
+        return False
+
     def inserir(self, dados):
         print(isinstance(dados, Oficio))
         if isinstance(dados, Oficio):
-            self.oficios.append(dados)
-            return True
+            if not self.verificar_hash(dados.Hash):
+                self.oficios.append(dados)
+                return True
         return False
 
     def persistir(self):
@@ -28,12 +35,13 @@ class Persistencia:
             for o in self.oficios:
                 oficios_json.append(o.to_json())
             with open(self.caminho, "w") as armazenamento:
-                json.dump({"oficios" : oficios_json}, armazenamento)
+                json.dump({"oficios" : oficios_json}, armazenamento, indent=4)
 
     def carregar(self, arquivo):
         with open(arquivo) as armazenamento:
             tmp_oficios = json.load(armazenamento)
+            print(len(tmp_oficios["oficios"]))
             if len(tmp_oficios["oficios"])>0:
                 for o in tmp_oficios['oficios']:
                     tmp_oficio = Oficio(oficio_json = o)
-                    self.inserir(o)
+                    self.inserir(tmp_oficio)

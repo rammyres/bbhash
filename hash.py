@@ -30,6 +30,7 @@ def hashfile(file):
 
 if __name__=="__main__":
    oficios_db = Persistencia("oficios.json")
+
    print("Script de protocolo de oficios")
    while(True):
       print("Escolha uma opção: ")
@@ -56,8 +57,11 @@ if __name__=="__main__":
                Hash = Hash
             )
             o.print_data()
-            oficios_db.inserir(o)
-            oficios_db.persistir()
+            if oficios_db.inserir(o):
+               oficios_db.persistir()
+               print("Base de oficios atualizada")
+            else:
+               print("Oficio já consta na base de protocolos")
             break
             # except:
                #  print("Arquivo no formato invalido ou inexistente")
