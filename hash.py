@@ -35,9 +35,11 @@ if __name__=="__main__":
    print("Script de protocolo de oficios")
    while(True):
       print("Escolha uma opção: ")
-      print("1 - Protoclar novo ofício")
-      print("2 - Listar ofícios protolados")
-      print("3 - Exportar QR Code de ofícios protolados")
+      print("1 - Protocolar novo ofício")
+      
+      if len(oficios_db.oficios)>0:
+         print("2 - Listar ofícios protolados")
+         print("3 - Exportar QR Code de ofícios protolados")
       print("9 - Sair")
       e = input("Digite a escolha: ")
 
@@ -80,6 +82,8 @@ if __name__=="__main__":
                   oficios_db.oficios[int(ex)-1].print_data()
             except ValueError:
                print("Digite um numero válido ou 'sair'")
+            except IndexError:
+               print("Número de oficio inexistente")
       elif e == '3':
          while(True):
             try:
