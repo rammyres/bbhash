@@ -71,32 +71,37 @@ if __name__=="__main__":
             except PdfReadError:
                print("Arquivo no formato invalido ou inexistente\nPor hora esse script só processa arquivos PDF")
       elif e == '2':
-         while(True):
-            try:
-               for i in range(len(oficios_db.oficios)):
-                  print("{} - {}".format(i+1, oficios_db.oficios[i].descricao))
-               ex = input("Digite o numero para detalhar o ofício ou 'sair' para retornar ao menu anterior: ")
-               if ex == 'sair':
-                  break
-               else: 
-                  oficios_db.oficios[int(ex)-1].print_data()
-            except ValueError:
-               print("Digite um numero válido ou 'sair'")
-            except IndexError:
-               print("Número de oficio inexistente")
+         if len(oficios_db.oficios)>0:
+            while(True):
+               try:
+                  for i in range(len(oficios_db.oficios)):
+                     print("{} - {}".format(i+1, oficios_db.oficios[i].descricao))
+                  ex = input("Digite o numero para detalhar o ofício ou 'sair' para retornar ao menu anterior: ")
+                  if ex == 'sair':
+                     break
+                  else: 
+                     oficios_db.oficios[int(ex)-1].print_data()
+               except ValueError:
+                  print("Digite um numero válido ou 'sair'")
+               except IndexError:
+                  print("Número de oficio inexistente")
+         else:
+            print("Opção inválida")
       elif e == '3':
-         while(True):
-            try:
-               for i in range(len(oficios_db.oficios)):
-                  print("{} - {}".format(i+1, oficios_db.oficios[i].descricao))
-               ex = input("Digite o numero para exportar o QR Code ou 'sair' para retornar ao menu anterior: ")
-               if ex == 'sair':
-                  break
-               else: 
-                  oficios_db.oficios[int(ex)-1].exportar_qrcode()
-            except ValueError:
-               print("Digite um numero válido ou 'sair'")
-
+         if len(oficios_db.oficios)>0:
+            while(True):
+               try:
+                  for i in range(len(oficios_db.oficios)):
+                     print("{} - {}".format(i+1, oficios_db.oficios[i].descricao))
+                  ex = input("Digite o numero para exportar o QR Code ou 'sair' para retornar ao menu anterior: ")
+                  if ex == 'sair':
+                     break
+                  else: 
+                     oficios_db.oficios[int(ex)-1].exportar_qrcode()
+               except ValueError:
+                  print("Digite um numero válido ou 'sair'")
+         else:
+            print("Opção inválida")
 
       elif e == '9':
          break
