@@ -39,7 +39,7 @@ if __name__=="__main__":
       
       if len(oficios_db.oficios)>0:
          print("2 - Listar ofícios protolados")
-         print("3 - Exportar QR Code de ofícios protolados")
+         print("3 - Exportar QR Code de ofícios protocolados")
       print("9 - Sair")
       e = input("Digite a escolha: ")
 
@@ -77,7 +77,7 @@ if __name__=="__main__":
                   for i in range(len(oficios_db.oficios)):
                      print("{} - {}".format(i+1, oficios_db.oficios[i].descricao))
                   ex = input("Digite o numero para detalhar o ofício ou 'sair' para retornar ao menu anterior: ")
-                  if ex == 'sair':
+                  if ex.lower() == 'sair':
                      break
                   else: 
                      oficios_db.oficios[int(ex)-1].print_data()
@@ -94,7 +94,7 @@ if __name__=="__main__":
                   for i in range(len(oficios_db.oficios)):
                      print("{} - {}".format(i+1, oficios_db.oficios[i].descricao))
                   ex = input("Digite o numero para exportar o QR Code ou 'sair' para retornar ao menu anterior: ")
-                  if ex == 'sair':
+                  if ex.lower() == 'sair':
                      break
                   else: 
                      oficios_db.oficios[int(ex)-1].exportar_qrcode()
