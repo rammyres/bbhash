@@ -45,8 +45,9 @@ class Oficio:
 
     def exportar_qrcode(self):
         qr = qrcode.make(self.to_json())
-        qr.save("{}.png".format(self.arquivo))
-        print("QR code salvo em {}.png".format(self.arquivo))
+        # qr.save("{}.png".format(self.arquivo))
+        qr.save("img/qr.png")
+        # print("QR code salvo em {}.png".format(self.arquivo))
 
     def print_data(self):
         print("Descrição: {}".format(self.descricao))

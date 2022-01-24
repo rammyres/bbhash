@@ -4,16 +4,20 @@ from PyPDF2.utils import PdfReadError
 from datetime import date
 from lib.persistencia import Persistencia
 from lib.oficio import Oficio
+import textwrap
+from PIL import Image, ImageDraw, ImageFont
 
 def count_pages(filename):
-    count = 0
-    with open(filename,"rb") as file:
-       data = PyPDF2.PdfFileReader(file)
-       count = data.getNumPages()
-       file.close()
-    return count
+   filename = filename.replace(" ", "")
+   count = 0
+   with open(filename,"rb") as file:
+      data = PyPDF2.PdfFileReader(file)
+      count = data.getNumPages()
+      file.close()
+   return count
 
-def hashfile(file): 
+def hashfile(file):
+   file = file.replace(" ", "") 
    sha256 = hashlib.sha256()
    BUF_SIZE = 65536  
    try:
@@ -28,6 +32,46 @@ def hashfile(file):
    except:
       print("Arquivo vazio ou inexistente")
 
+
+def exportar_protocolo(filehash, qr, data):
+   fundo = Image.open("img/base.png")
+   qr = Image.open('img/qr.png')
+   qr.thumbnail((120, 120))
+
+   fundo.paste(qr, (5, 112))
+
+   im_w = 140
+   im_h = 100
+   im_y = 5
+
+   im = Image.new(mode="RGB", size=(im_w, im_h), color=(255,255,255,0))
+   fonte = ImageFont.truetype("fonts/BancoDoBrasilTextos-Regular.ttf", 14)
+   desenho = ImageDraw.Draw(im)
+
+   lines = textwrap.wrap(filehash, width=14)
+
+   y_text = im_y
+
+   for line in lines:
+      width, height = fonte.getsize(line)
+      desenho.text(((im_w - width) / 2, y_text), line, font=fonte, fill=(0,0,0,0))
+      y_text += height
+
+   fundo.paste(im, (2, 3))
+
+   texto_data = "Recebido em 22 de novembro de 2022"
+   fonte_data = ImageFont.truetype("fonts/BancoDoBrasilTextos-Regular.ttf", 18)
+   largura, altura = desenho.textsize(texto_data, fonte_data)
+   print(largura)
+   
+   im_data = Image.new(mode="RGB", size=(largura+4, altura), color=(255,255,255,0))
+   desenho = ImageDraw.Draw(im_data)  
+   
+   desenho.text((2, 0), text=texto_data, font=fonte_data, fill=(0, 0, 0, 0))
+
+   fundo.paste(im_data, (140, 130))
+   fundo.show()
+   # fundo.save("protocolo.png")
 
 if __name__=="__main__":
    oficios_db = Persistencia("oficios.json")
@@ -65,6 +109,7 @@ if __name__=="__main__":
                   oficios_db.persistir()
                   print("Base de oficios atualizada")
                   o.exportar_qrcode()
+                  exportar_protocolo(o.Hash, 'img/qr.png', o.data_protocolo)
                else:
                   print("Oficio já consta na base de protocolos")
                break
@@ -97,7 +142,8 @@ if __name__=="__main__":
                   if ex.lower() == 'sair':
                      break
                   else: 
-                     oficios_db.oficios[int(ex)-1].exportar_qrcode()
+                     # oficios_db.oficios[int(ex)-1].exportar_qrcode()
+                     exportar_protocolo(oficios_db.oficios[int(ex)-1].Hash, 'img/qr.png', oficios_db.oficios[int(ex)-1].data_protocolo)
                except ValueError:
                   print("Digite um numero válido ou 'sair'")
          else:
