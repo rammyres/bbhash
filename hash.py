@@ -54,7 +54,7 @@ def exportar_protocolo(filehash, qr, data):
 
    for line in lines:
       width, height = fonte.getsize(line)
-      desenho.text(((im_w - width) / 2, y_text), line, font=fonte, fill=(0,0,0,0))
+      desenho.text((2 / 2, y_text), line, font=fonte, fill=(0,0,0,0))
       y_text += height
 
    fundo.paste(im, (2, 3))
